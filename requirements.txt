@@ -1,0 +1,8 @@
+torch
+# torchvision
+torchaudio
+tqdm
+matplotlib
+numpy
+# pip3 install torch torchvision
+# pip3 install torchaudio

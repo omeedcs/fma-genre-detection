@@ -91,6 +91,11 @@ We test the following modern machine learning methods:
 This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
+Create a conda environment: conda create --name pygenre python=3.8
+activate environment:   WINDOWS: activate py35
+                        LINUX, macOS: conda activate pygenre
+run requirements.txt file: pip3 install -r requirements.txt
+
 <!-- ABOUT THE PROJECT -->
 ## Dataset Used
 
