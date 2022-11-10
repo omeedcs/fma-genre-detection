@@ -91,10 +91,30 @@ We test the following modern machine learning methods:
 This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
+virtualenv music_genre_env
+source music_genre_env/bin/activate
+pip3 install -r requirements.txt
+
+
+<!-- # to handle m1 issue: 
+conda config --add channels conda-forge
+pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+
+
+conda create -y --name pygenreaudio python=3.8
+conda install --force-reinstall -y -q --name pygenreaudio -c conda-forge --file requirements.txt
+conda activate pygenreaudio -->
+<!-- 
+
 Create a conda environment: conda create --name pygenre python=3.8
-activate environment:   WINDOWS: activate py35
+                            conda install  -n pygenre pip
+                        <!-- conda install pip -->
+<!-- activate environment:   WINDOWS: activate py35
                         LINUX, macOS: conda activate pygenre
 run requirements.txt file: pip3 install -r requirements.txt
+if on mac m1: pip install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
+else:
+  pip install torchaudio --> -->
 
 <!-- ABOUT THE PROJECT -->
 ## Dataset Used

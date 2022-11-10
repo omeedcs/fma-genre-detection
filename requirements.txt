@@ -1,8 +1,9 @@
-torch
-# torchvision
-torchaudio
+# torch
+torchvision
 tqdm
 matplotlib
 numpy
+seaborn
+torchaudio
 # pip3 install torch torchvision
 # pip3 install torchaudio
