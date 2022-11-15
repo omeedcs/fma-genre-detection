@@ -17,18 +17,27 @@ class AudioDataset(Dataset):
         audio_files = [] # TODO: make numpy array
         genres = [] # TODO: make numpy array
 
-
+        not_found_cnt = 0
+        torch_audio_read_error_cnt = 0
         for subdir, dirs, files in os.walk(audio_folder_path):
             for filename in files:
                 if filename.endswith(('.mp3')):
-                    track_id = eval(filename.rstrip(".mp3")) 
+                    track_id = eval(filename.rstrip(".mp3").lstrip('0')) 
                     track_csv_index = track_csv.index[track_csv["Unnamed: 0"] == track_id].tolist()
-                    assert len(track_csv_index) == 1
+                    if not track_csv_index:
+                        not_found_cnt +=1
+                        continue
+                    # assert len(track_csv_index) == 1
                     genre = genres_csv.iloc[track_csv_index[0]]
                     #print os.path.join(subdir, file)
                     filepath = subdir + os.sep + filename
-                    data_waveform, rate_of_sample = torchaudio.load(filepath)
+                    try:
+                        data_waveform, rate_of_sample = torchaudio.load(filepath)
+                    except Exception as e:
+                        torch_audio_read_error_cnt +=1
                     data_waveform = self.apply_preproccess(data_waveform, preprocessing_dict)
+                    if data_waveform.shape[1] < 1300000:
+                        continue
                     audio_files.append(data_waveform)
                     genres.append(genre)
         audio_files= np.concatenate(audio_files)
@@ -46,12 +55,12 @@ class AudioDataset(Dataset):
     
     def apply_preproccess(self, waveform, proccessing_dict):
         sampling =  proccessing_dict["sampling"]
-        assert type(sampling) == dict
+        if not (not sampling or type(sampling) == dict):
+            raise ValueError("sampling should either be none or a dictionary but instead is type {}".format(type(sampling)))
         padding_length = proccessing_dict["padding_length"]
         truncation_len = proccessing_dict["truncation_len"]
         convert_one_channel = proccessing_dict["convert_one_channel"]
-
-        if not (padding_length!=None and truncation_len!=None):
+        if padding_length!=None and truncation_len!=None:
             raise ValueError("Invalid processing parameters. One should not pad and truncate the same sample.")
         
         if sampling != None:
@@ -66,7 +75,7 @@ class AudioDataset(Dataset):
             waveform = truncate_sample(waveform, truncation_len)
 
         if convert_one_channel != None:
-            waveform = convert_one_channel(waveform)
+            waveform = convert_to_one_channel(waveform)
         return waveform
     # def input_size(self):
     #     raise NotImplementedError()

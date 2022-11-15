@@ -18,5 +18,5 @@ def truncate_sample(waveform, max_length):
 def pad_right(waveform, min_samples):
     raise NotImplementedError()
 
-def convert_one_channel(waveform):
+def convert_to_one_channel(waveform):
     return torch.mean(waveform, dim=0, keepdim= True)

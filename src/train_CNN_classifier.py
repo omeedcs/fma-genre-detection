@@ -6,7 +6,7 @@ import numpy as np
 from tqdm.notebook import tqdm
 import torch.nn.functional as F
 from collections import deque
-
+import pickle # TODO: can replace with h5py file 
 
 
 def get_data_loaders(dataset, batch_size):
@@ -17,7 +17,7 @@ def get_data_loaders(dataset, batch_size):
     test_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, sampler=test_indices)
     return train_loader, val_loader, test_loader
 
-# modified from existing implementation of a computer vision training loop I built: https://github.com/achandlr/Musical-Instruments/blob/master/2022%20Implementation%20(Improved%20Implementation%20With%20Different%20Focus)/Using%20Transfer%20Learning%20for%20Musical%20Instrument%20Classification.ipynb  
+# heavily modified from existing implementation of a computer vision training loop I built: https://github.com/achandlr/Musical-Instruments/blob/master/2022%20Implementation%20(Improved%20Implementation%20With%20Different%20Focus)/Using%20Transfer%20Learning%20for%20Musical%20Instrument%20Classification.ipynb  
 def test_network(model, test_loader, description, debug= False, device = "cpu"):
     correct = 0
     total = 0
@@ -39,7 +39,7 @@ def test_network(model, test_loader, description, debug= False, device = "cpu"):
     print('%s has a test accuracy of : %0.3f' % (description, acc))
     return acc
 
-# modified from existing implementation of a computer vision training loop I built: https://github.com/achandlr/Musical-Instruments/blob/master/2022%20Implementation%20(Improved%20Implementation%20With%20Different%20Focus)/Using%20Transfer%20Learning%20for%20Musical%20Instrument%20Classification.ipynb  
+# heavily modified from existing implementation of a computer vision training loop I built: https://github.com/achandlr/Musical-Instruments/blob/master/2022%20Implementation%20(Improved%20Implementation%20With%20Different%20Focus)/Using%20Transfer%20Learning%20for%20Musical%20Instrument%20Classification.ipynb  
 def train_network_with_validation(model, train_loader, val_loader, test_loader, criterion, optimizer, description, num_epochs=20, device = "cpu"):
     queue_capacity=1000
     loss_queue = deque(maxlen=queue_capacity)
@@ -100,9 +100,10 @@ if __name__ == "__main__":
     args.audio_folder_path = "data/fma_small"
     args.sampling = None # {"orig_freq": None, "new_freq": None}
     args.padding_length = None
-    args.truncation_length = None
+    args.truncation_length = 1300000
     args.convert_one_channel = True
-
+    args.load_dataset_path = None # or logs/datasets/dataset_fma_small_one_channel
+    args.desired_dataset_name = "dataset_fma_small_one_channel"
     if args.audio_folder_path == "data/fma_small":
         num_genres = 8
     else:
@@ -128,8 +129,14 @@ if __name__ == "__main__":
         test_description = "Testing M5 CNN model on test data"
     else:
         raise NotImplementedError()
-
-    dataset = AudioDataset(meta_data_path = "data/fma_metadata", audio_folder_path = args.audio_folder_path, preprocessing_dict = preprocessing_dict)
+    if args.load_dataset_path != None:
+        with open(args.load_dataset_path, "rb") as input_file:     
+            dataset = pickle.load(input_file)
+    else:
+        dataset = AudioDataset(meta_data_path = "data/fma_metadata", audio_folder_path = args.audio_folder_path, preprocessing_dict = preprocessing_dict)
+        # save dataset in logs/datasets
+        with open("logs/datasets/"+args.desired_dataset_name, "wb") as output_file:
+            pickle.dump(dataset, output_file)
     train_loader, val_loader, test_loader = get_data_loaders(dataset, batch_size=args.batch_size)
 
     queue_loss_list, train_loss_list, val_loss_list = train_network_with_validation(model, train_loader, val_loader, test_loader, criterion, optimizer, description, num_epochs=args.num_epochs, device = "cpu")
