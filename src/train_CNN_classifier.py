@@ -1,7 +1,7 @@
 from models.M5_Audio_Classifier import *
 from utils.dataset import AudioDataset
-from torch.utils.data import Dataset, Dataloader
-from utils.parsers import AETrainingParser
+from torch.utils.data import Dataset, DataLoader
+from utils.parsers import CNNTrainingParser
 import numpy as np
 from tqdm.notebook import tqdm
 import torch.nn.functional as F
@@ -92,12 +92,28 @@ def train_network_with_validation(model, train_loader, val_loader, test_loader, 
 
 # Note to grader: K-Fold validation and other cross validation techniques are not used due to computational constraints
 if __name__ == "__main__":
-    args = AETrainingParser.parse_args()
+    args = CNNTrainingParser.parse_args()
     args.batch_size = 4 # TODO: delete later
     args.device = "cpu"
     args.num_epochs = 5
     args.model_name = "M5"
     args.audio_folder_path = "data/fma_small"
+    args.sampling = None # {"orig_freq": None, "new_freq": None}
+    args.padding_length = None
+    args.truncation_length = None
+    args.convert_one_channel = True
+
+    if args.audio_folder_path == "data/fma_small":
+        num_genres = 8
+    else:
+        raise NotImplementedError()
+    # build preprocessing_dict from arg parameters
+    preprocessing_dict = {
+        "sampling": args.sampling,
+        "padding_length": args.padding_length,
+        "truncation_len" : args.truncation_length,
+        "convert_one_channel": args.convert_one_channel
+    }
     num_genres = 8
     if args.model_name == "M5":
         n_input = 1 # TODO: likely need to change
@@ -113,7 +129,7 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError()
 
-    dataset = AudioDataset(meta_data_path = "data/fma_metadata", audio_folder_path = args.audio_folder_path)
+    dataset = AudioDataset(meta_data_path = "data/fma_metadata", audio_folder_path = args.audio_folder_path, preprocessing_dict = preprocessing_dict)
     train_loader, val_loader, test_loader = get_data_loaders(dataset, batch_size=args.batch_size)
 
     queue_loss_list, train_loss_list, val_loss_list = train_network_with_validation(model, train_loader, val_loader, test_loader, criterion, optimizer, description, num_epochs=args.num_epochs, device = "cpu")
