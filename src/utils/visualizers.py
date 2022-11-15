@@ -15,7 +15,7 @@ def get_spectrogram(waveform, n_fft = 400, win_len = None, hop_len = None,power 
     return spectrogram(waveform)
 
 
-# https://pytorch.org/audio/stable/tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py
+# used default parameters from https://pytorch.org/audio/stable/tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py
 def get_mel_spectrogram(waveform, sample_rate, n_fft = 400, win_len = None, hop_len = 512, n_mels=128):
     mel_spectrogram = T.MelSpectrogram(
     sample_rate=sample_rate,
@@ -31,7 +31,7 @@ def get_mel_spectrogram(waveform, sample_rate, n_fft = 400, win_len = None, hop_
     mel_scale="htk")
     return mel_spectrogram(waveform)
 
-# https://pytorch.org/audio/stable/tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py
+# modified from premade starter function at https://pytorch.org/audio/stable/tutorials/audio_feature_extractions_tutorial.html#sphx-glr-tutorials-audio-feature-extractions-tutorial-py
 def plot_spectrogram(spectrogram, title = "Spectrogram Plot for Waveform", xlabel = "Frequency Bins", ylabel = "Frame"):
     fig, axs = plt.subplots(1, 1)
     axs.set_title(title)
