@@ -28,6 +28,9 @@ class AudioDataset(Dataset):
                     data_waveform, rate_of_sample = torchaudio.load(filepath)
                     audio_files.append(data_waveform)
                     genres.append(genre)
+        audio_files= np.concatenate(audio_files)
+        genres= np.concatenate(genres)
+
         self.audio_files = audio_files
         self.genres = genres
         # build pairs of audio file to genre
@@ -36,13 +39,11 @@ class AudioDataset(Dataset):
     def __len__(self):
         assert len(self.audio_files) == len(self.genres)
         return len(self.audio_files)
-        raise NotImplementedError()
         # return len(self.cat_embeddings)
     
-    def input_size(self):
-        raise NotImplementedError()
-        # return self.cat_embeddings.shape[1]
+    # def input_size(self):
+    #     raise NotImplementedError()
+    #     # return self.cat_embeddings.shape[1]
 
     def __getitem__(self, idx):
         return self.audio_files[idx], self.genres[idx]
-        raise NotImplementedError()
