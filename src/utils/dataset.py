@@ -23,7 +23,7 @@ class AudioDataset(Dataset):
         for subdir, dirs, files in os.walk(audio_folder_path):
             for filename in files:
                 if filename.endswith(('.mp3')):
-                    if debug and len(audio_tensors) > 10:
+                    if debug and len(audio_tensors) > 200:
                         break
                     track_id = eval(filename.rstrip(".mp3").lstrip('0')) 
                     track_csv_index = track_csv.index[track_csv["Unnamed: 0"] == track_id].tolist()
@@ -36,13 +36,15 @@ class AudioDataset(Dataset):
                     filepath = subdir + os.sep + filename
                     try:
                         data_waveform, rate_of_sample = torchaudio.load(filepath)
+                        preprocessing_dict["orig_freq"] = rate_of_sample
                     except Exception as e:
                         torch_audio_read_error_cnt +=1
                     data_waveform = self.apply_preproccess(data_waveform, preprocessing_dict)
                     if datatype == "np":
                         data_waveform = data_waveform.detach().numpy()
                     # ignore smaller audio samples (very rarely)
-                    if data_waveform.shape[1] < 1300000:
+                    # TODO: confirm that replacing 1_300_000 with preprocessing_dict["truncation_len"] does not mess things up
+                    if data_waveform.shape[1] < preprocessing_dict["truncation_len"]:
                         small_audio_file_cnt+=1
                         continue
                     audio_tensors.append(data_waveform)
@@ -51,7 +53,7 @@ class AudioDataset(Dataset):
         genres= np.array(genres)
 
         self.audio_tensors = audio_tensors
-        self.genres = genres
+        genres = genres
         self.genres_factorized = pd.factorize(pd.Series(genres))
 
 
@@ -60,18 +62,19 @@ class AudioDataset(Dataset):
         return len(self.audio_tensors)
     
     def apply_preproccess(self, waveform, proccessing_dict):
-        sampling =  proccessing_dict["sampling"]
-        if not (not sampling or type(sampling) == dict):
-            raise ValueError("sampling should either be none or a dictionary but instead is type {}".format(type(sampling)))
+        sampling_freq =  proccessing_dict["sampling_freq"]
+        orig_freq = proccessing_dict["orig_freq"]
+        # if not (not sampling or type(sampling) == dict):
+        #     raise ValueError("sampling should either be none or a dictionary but instead is type {}".format(type(sampling)))
         padding_length = proccessing_dict["padding_length"]
         truncation_len = proccessing_dict["truncation_len"]
         convert_one_channel = proccessing_dict["convert_one_channel"]
         if padding_length!=None and truncation_len!=None:
             raise ValueError("Invalid processing parameters. One should not pad and truncate the same sample.")
         
-        if sampling != None:
-            orig_freq, new_freq = sampling["orig_freq"], sampling["new_freq"]
-            waveform = resample(waveform, orig_freq, new_freq)
+        if sampling_freq != None:
+            # orig_freq, new_freq = sampling["orig_freq"], sampling["new_freq"]
+            waveform = resample(waveform, orig_freq, sampling_freq)
 
         # Not necessary for our project
         if padding_length != None:

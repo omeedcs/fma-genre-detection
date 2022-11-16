@@ -4,7 +4,7 @@ from models.FeedForward import *
 
 from utils.dataset import AudioDataset
 from torch.utils.data import Dataset, DataLoader
-from utils.parsers import CNNTrainingParser
+from utils.parsers import training_parser
 import numpy as np
 from tqdm.notebook import tqdm
 import torch.nn.functional as F
@@ -95,17 +95,17 @@ def train_network_with_validation(model, train_loader, val_loader, test_loader, 
 
 # Note to grader: K-Fold validation and other cross validation techniques are not used due to computational constraints
 if __name__ == "__main__":
-    args = CNNTrainingParser.parse_args()
+    args = training_parser.parse_args()
     args.batch_size = 4 # TODO: delete later
     args.device = "cpu"
     args.num_epochs = 5
     args.model_name = "M5"
     args.audio_folder_path = "data/fma_small"
-    args.sampling = None # {"orig_freq": None, "new_freq": None}
+    args.sampling_freq = None 
     args.padding_length = None
     args.truncation_length = 1300000
     args.convert_one_channel = True
-    args.load_dataset_path = None # or logs/datasets/dataset_fma_small_one_channel
+    args.load_dataset_path = "logs/datasets/dataset_fma_small_one_channel"
     args.debug = True  # TODO delete
     args.desired_dataset_name = "dataset_fma_small_one_channel_np"
     args.datatype = "np"
@@ -115,15 +115,15 @@ if __name__ == "__main__":
         raise NotImplementedError()
     # build preprocessing_dict from arg parameters
     preprocessing_dict = {
-        "sampling": args.sampling,
+        "sampling_freq": args.sampling_freq,
         "padding_length": args.padding_length,
         "truncation_len" : args.truncation_length,
         "convert_one_channel": args.convert_one_channel
     }
     num_genres = 8
     if args.model_name == "M5":
-        n_input = 1 # TODO: likely need to change
-        model = M5(n_input=1, n_output=num_genres) # TODO
+        n_input = 1_300_000 # TODO: likely need to change
+        model = M5(n_input=1_300_000, n_output=num_genres) # TODO
         lr = 8e-5
         # can also experiment with different parameters
         optimizer = optim.Adam(model.parameters(), lr=lr) 
