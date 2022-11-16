@@ -31,6 +31,7 @@ def test_network(model, test_loader, description, debug= False, device = "cpu"):
           inputs = inputs.to(device)
           labels = labels.to(device)
           outputs = model.forward(inputs)
+          outputs = torch.squeeze(outputs)
           predicted = torch.argmax(outputs.cpu(), dim=1)
           total += labels.size(0)
           correct += (predicted == labels.cpu()).sum().item()
@@ -63,6 +64,7 @@ def train_network_with_validation(model, train_loader, val_loader, test_loader, 
                 optimizer.zero_grad()
                 # print(inputs.shape)
                 outputs = model.forward(inputs)
+                outputs = torch.squeeze(outputs)
                 loss = criterion(outputs, labels) 
                 # print("loss {}".format(loss))
                 loss_queue.append(loss.item())
@@ -81,6 +83,7 @@ def train_network_with_validation(model, train_loader, val_loader, test_loader, 
                   inputs = inputs.to(device)
                   labels = labels.to(device)
                   outputs = model.forward(inputs)
+                  outputs = torch.squeeze(outputs)
                   loss = criterion(outputs, labels)
                   total_loss += loss.item()
                   count += 1
@@ -105,10 +108,11 @@ if __name__ == "__main__":
     args.padding_length = None
     args.truncation_length = 1300000
     args.convert_one_channel = True
-    args.load_dataset_path = "logs/datasets/dataset_fma_small_one_channel"
-    args.debug = True  # TODO delete
-    args.desired_dataset_name = "dataset_fma_small_one_channel_np"
-    args.datatype = "np"
+    # args.load_dataset_path = "logs/datasets/dataset_fma_small_one_channel"
+    args.load_dataset_path = None
+    args.debug = False  # TODO delete
+    args.desired_dataset_name = "dataset_fma_small_one_channel_torch"
+    args.datatype = "torch"
     if args.audio_folder_path == "data/fma_small":
         num_genres = 8
     else:
@@ -123,12 +127,16 @@ if __name__ == "__main__":
     num_genres = 8
     if args.model_name == "M5":
         n_input = 1_300_000 # TODO: likely need to change
-        model = M5(n_input=1_300_000, n_output=num_genres) # TODO
-        lr = 8e-5
+        if args.convert_one_channel:
+            in_channels = 1
+        else:
+            in_channels = 2
+        model = M5(n_input=in_channels, n_output=num_genres) 
+        lr = 1e-4
         # can also experiment with different parameters
         optimizer = optim.Adam(model.parameters(), lr=lr) 
         # can also try other optimzers like SGD
-        epochs = 50
+        epochs = 30
         criterion = nn.CrossEntropyLoss()
         description = "Training M5 CNN model with Adam and CrossEntropyLoss"
         test_description = "Testing M5 CNN model on test data"

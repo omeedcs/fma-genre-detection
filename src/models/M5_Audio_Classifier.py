@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 class M5(nn.Module):
-    def __init__(self, n_input=1, n_output=35, stride=16, n_channel=1):
+    def __init__(self, n_input, n_output, stride=16, n_channel=32):
         super().__init__()
         self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
         self.bn1 = nn.BatchNorm1d(n_channel)
@@ -30,6 +30,10 @@ class M5(nn.Module):
         self.fc1 = nn.Linear(2 * n_channel, n_output)
 
     def forward(self, x):
+        # make data [batch_size, input_channels, signal_length]
+        x = torch.unsqueeze(x, dim=-2)
+        # x = x.permute(0,2,1)
+        # batch len, by channel length, by tensor for each channel
         x = self.conv1(x)
         x = F.relu(self.bn1(x))
         x = self.pool1(x)
