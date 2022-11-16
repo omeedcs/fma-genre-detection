@@ -45,14 +45,14 @@ regression = LinearRegression().fit(x_train, y_train)
 # predict the response for test dataset
 y_pred = regression.predict(x_test)
 
-# model accuracy, how often is the classifier correct?
+# accuracy important?
 print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
-# print mse
+# TODO: should we do more than MSE like the hw's?
 print("Mean squared error: %.2f"
         % metrics.mean_squared_error(y_test, y_pred))
 
-# TODO
+# TODO: should we visualize here? 
 # # visualize
 # plt.scatter(x_test, y_test)
 # plt.plot(x_test, y_pred, color="black", linewidth=3)
