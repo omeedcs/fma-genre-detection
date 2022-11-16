@@ -11,7 +11,7 @@ from utils.dataprocessing import *
 
 class AudioDataset(Dataset):
 
-    def __init__(self, meta_data_path, audio_folder_path, preprocessing_dict = {}, debug = False):
+    def __init__(self, meta_data_path, audio_folder_path, preprocessing_dict = {}, debug = False, datatype = "torch"):
         track_csv = pd.read_csv(meta_data_path+"/tracks.csv", header=1).iloc[1: , :]
         genres_csv = track_csv["genre_top"]
         audio_tensors = [] 
@@ -23,7 +23,7 @@ class AudioDataset(Dataset):
         for subdir, dirs, files in os.walk(audio_folder_path):
             for filename in files:
                 if filename.endswith(('.mp3')):
-                    if debug and len(audio_tensors) > 100:
+                    if debug and len(audio_tensors) > 10:
                         break
                     track_id = eval(filename.rstrip(".mp3").lstrip('0')) 
                     track_csv_index = track_csv.index[track_csv["Unnamed: 0"] == track_id].tolist()
@@ -39,6 +39,8 @@ class AudioDataset(Dataset):
                     except Exception as e:
                         torch_audio_read_error_cnt +=1
                     data_waveform = self.apply_preproccess(data_waveform, preprocessing_dict)
+                    if datatype == "np":
+                        data_waveform = data_waveform.detach().numpy()
                     # ignore smaller audio samples (very rarely)
                     if data_waveform.shape[1] < 1300000:
                         small_audio_file_cnt+=1
@@ -46,17 +48,18 @@ class AudioDataset(Dataset):
                     audio_tensors.append(data_waveform)
                     genres.append(genre)
         audio_tensors= np.concatenate(audio_tensors)
-        genres= np.concatenate(genres)
+        genres= np.array(genres)
 
         self.audio_tensors = audio_tensors
         self.genres = genres
+        self.genres_factorized = pd.factorize(pd.Series(genres))
+
         # build pairs of audio file to genre
-        return self.audio_tensors, self.genres
+        return self.audio_tensors, self.genres_factorized
 
     def __len__(self):
-        assert len(self.audio_files) == len(self.genres)
-        return len(self.audio_files)
-        # return len(self.cat_embeddings)
+        assert len(self.audio_tensors) == len(self.genres_factorized[0])
+        return len(self.audio_tensors)
     
     def apply_preproccess(self, waveform, proccessing_dict):
         sampling =  proccessing_dict["sampling"]
@@ -86,5 +89,5 @@ class AudioDataset(Dataset):
     #     raise NotImplementedError()
     #     # return self.cat_embeddings.shape[1]
 
-    def __getitem__(self, idx):
-        return self.audio_files[idx], self.genres[idx]
+    def __getitem__(self, idx):        
+        return self.audio_tensors[idx], self.genres_factorized[0][idx]
