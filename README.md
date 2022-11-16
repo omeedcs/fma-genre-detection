@@ -80,7 +80,16 @@
 Our project compares traditional machine learning techniques to modern approaches for audio genre classification.
 
 We test the following traditional machine learning methods:
-1. TODO: Include traditional machine learning methods
+FFNN (Feed Forward Neural Network (no attention, convoltion, or anything fancy)) (sanity check) (use pytorch) (Omeed)
+SVM (Felipe)
+Decision tree (Kunal)
+naive bayes 
+K-nearest neighbors
+some kind of pipeline 
+Ensemble classifiers
+cross validation
+Regression
+2. Clustering (DBSCAN, Hierarchical Clustering, K-Means)
 
 We test the following modern machine learning methods:
 1. VGG16, Inception, AlexNet, or something more recent
