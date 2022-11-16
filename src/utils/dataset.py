@@ -54,8 +54,6 @@ class AudioDataset(Dataset):
         self.genres = genres
         self.genres_factorized = pd.factorize(pd.Series(genres))
 
-        # build pairs of audio file to genre
-        return self.audio_tensors, self.genres_factorized
 
     def __len__(self):
         assert len(self.audio_tensors) == len(self.genres_factorized[0])
