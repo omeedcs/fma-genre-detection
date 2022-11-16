@@ -1,4 +1,7 @@
+# import the models
 from models.M5_Audio_Classifier import *
+from models.FeedForward import *
+
 from utils.dataset import AudioDataset
 from torch.utils.data import Dataset, DataLoader
 from utils.parsers import CNNTrainingParser
@@ -128,8 +131,17 @@ if __name__ == "__main__":
         criterion = nn.CrossEntropyLoss()
         description = "Training M5 CNN model with Adam and CrossEntropyLoss"
         test_description = "Testing M5 CNN model on test data"
+    elif args.model_name == "FF":
+        n_input = 1_300_000
+        num_genres = 8
+        model = FF(n_input=n_input, n_output=num_genres)
+        optimizer = optim.Adam(model.parameters(), lr=1e-3)
+        epochs = 50
+        criterion = nn.SGD()
+        description = "Training FF model with Adam and SGD"
+        test_description = "Testing FF model on test data"
     else:
-        raise NotImplementedError()
+        raise NotImplementedError("Model name not implemented")
     if args.load_dataset_path != None:
         with open(args.load_dataset_path, "rb") as input_file:     
             dataset = pickle.load(input_file)

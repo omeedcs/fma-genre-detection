@@ -12,3 +12,4 @@ CNNTrainingParser.add_argument("--padding_length", default = None, help = "Allow
 CNNTrainingParser.add_argument("--truncation_length", default = 1300000, help = "Specifies max length of a sample")
 CNNTrainingParser.add_argument("--convert_one_channel", default = True, help = "Boolean variable to decide if to convert waveform to one channel")
 CNNTrainingParser.add_argument("--load_dataset_path", default = None, help = "Path to load compressed dataset to save time")
+CNNTrainingParser.add_argument("--debug", default = False, help = "Allows for easy debugging")

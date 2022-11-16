@@ -103,6 +103,7 @@ if __name__ == "__main__":
     args.truncation_length = 1300000
     args.convert_one_channel = True
     args.load_dataset_path = None # or logs/datasets/dataset_fma_small_one_channel
+    args.debug = True  # TODO delete
     args.desired_dataset_name = "dataset_fma_small_one_channel"
     if args.audio_folder_path == "data/fma_small":
         num_genres = 8
@@ -127,13 +128,15 @@ if __name__ == "__main__":
         criterion = nn.CrossEntropyLoss()
         description = "Training M5 CNN model with Adam and CrossEntropyLoss"
         test_description = "Testing M5 CNN model on test data"
-    else:
-        raise NotImplementedError()
+    # else:
+    #     if args.model_name == "FF:
+    #         n_input = 1_300_000
+    #         model = FF(n_input=n_input, n_output=num_genres)
     if args.load_dataset_path != None:
         with open(args.load_dataset_path, "rb") as input_file:     
             dataset = pickle.load(input_file)
     else:
-        dataset = AudioDataset(meta_data_path = "data/fma_metadata", audio_folder_path = args.audio_folder_path, preprocessing_dict = preprocessing_dict)
+        dataset = AudioDataset(meta_data_path = "data/fma_metadata", audio_folder_path = args.audio_folder_path, preprocessing_dict = preprocessing_dict, debug = args.debug)
         # save dataset in logs/datasets
         with open("logs/datasets/"+args.desired_dataset_name, "wb") as output_file:
             pickle.dump(dataset, output_file)
