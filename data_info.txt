@@ -1,0 +1,9 @@
+Pickled Data (1000 and 3000 records):
+
+https://drive.google.com/drive/folders/1wp-qC4UbfDXqfuixU_4gb3h8xgPTSNWf?usp=sharing
+
+Full FMA Dataset and Subsets:
+
+https://github.com/mdeff/fma
+
+Note: we did not include the pickled data or full data in the final submission due to how large the files are.
