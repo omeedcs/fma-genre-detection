@@ -1,5 +1,4 @@
-# CS363M Final Project
-
+# Genre Detection and Model Evaluation with FMA using Traditional Machine Learning / Modern Approaches for Audio Classification
 
 ## Contributors: 
 Kunal Mody, Omeed Tehrani, Alex Chandler, Felipe Paz
